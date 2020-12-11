@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 import Image from 'next/image';
 import styled from 'styled-components';
 
 import Layout from '../../components/layout'
 
-export function getStaticPaths() {
+export const getStaticPaths: GetStaticPaths = async () => {
   const names = ["jae", "sungjin", "youngk", "wonpil", "dowoon"];
   // const paths = names.map((name) => `/members/${name}`)
 
@@ -18,20 +19,38 @@ export function getStaticPaths() {
   }
 }
 
-export async function getStaticProps({ params }) {
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const API_KEY = process.env.GOOGLE_API_KEY;
   const ENGINE_ID = process.env.GOOGLE_ENGINE_ID;
 
-  const nameConverter = {
-    "jae": "데이식스%20제이",
-    "sungjin": "데이식스%20성진",
-    "youngk": "데이식스%20영케이",
-    "wonpil": "데이식스%20원필",
-    "dowoon": "데이식스%20도운",
+  const nameConverter = (name) => {
+    switch(name) {
+      case "jae":
+        return "데이식스%20제이";
+        break;
+      case "sungjin":
+        return "데이식스%20성진";
+        break;
+      case "youngk":
+        return "데이식스%영케이";
+        break;
+      case "wonpil":
+        return "데이식스%20원필";
+        break;
+      case "dowoon":
+        return "데이식스%20도운";
+        break;
+      default:
+        return;
+    }
+    // "jae": "데이식스%20제이",
+    // "sungjin": "데이식스%20성진",
+    // "youngk": "데이식스%20영케이",
+    // "wonpil": "데이식스%20원필",
+    // "dowoon": "데이식스%20도운",
   }
 
-  const searchName = nameConverter[params.name];
-  console.log(searchName);
+  const searchName = nameConverter(params.name);
   const res = await fetch(`https://customsearch.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${ENGINE_ID}&searchType=image&q=${encodeURIComponent(searchName)}`);
   const photos = await res.json();
 
@@ -98,8 +117,12 @@ const DiaryRecord = styled.div`
   margin: 4px;
   color: #ffffff;
   font-size: 1.2em;
-
 `
+
+// interface MemberProps {
+//   params:
+//   photos: 
+// }
 
 export default function Member({ params, photos }) {
   const [inputVal, setInputVal] = useState("");
@@ -131,7 +154,7 @@ export default function Member({ params, photos }) {
   }, [records]);
 
   return (
-    <Layout>
+    <Layout home={false}>
       <Title>{nicknameConverter[params.name]}'s 페이지</Title>
       <ContentsContainer>
         <ImageContainer>
