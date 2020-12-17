@@ -127,7 +127,7 @@ const DiaryRecord = styled.div`
 export default function Member({ params, photos }) {
   const [inputVal, setInputVal] = useState("");
   const [records, setRecords] = useState([]);
-
+  
   useEffect(() => {
     console.log(photos);
   }, []);
@@ -163,7 +163,7 @@ export default function Member({ params, photos }) {
           ))}
         </ImageContainer>
       <DiaryContainer>
-        <DiaryInput type="text" value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={(e) => addRecord(e)} />
+        <DiaryInput type="text" value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyPress={(e) => addRecord(e)} />
         <DiaryRecordContainer>
           {records.map((record, idx) => 
             <DiaryRecord key={idx}>{record}</DiaryRecord>

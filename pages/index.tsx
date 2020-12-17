@@ -1,15 +1,65 @@
+import { useEffect, useState } from 'react';
+import Head from 'next/head';
+import Link from 'next/Link';
+import Image from 'next/image'
+import KaKaoLogin from 'react-kakao-login';
+import Cookies from 'js-cookie';
 import styled from 'styled-components';
 
-import Head from 'next/head'
-import Link from 'next/Link'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { GetStaticProps } from 'next';
+import axios from 'axios';
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const kakaoKey = process.env.KAKAO_JS_KEY;
+
+  return {
+    props: {
+      kakaoKey
+    },
+  }
+}
 
 const Title = styled.h1`
   color: red;
 `;
 
-export default function Home() {  
+const KaKaoLoginBtn = styled(KaKaoLogin)`
+  cursor: pointer;
+`
+
+export default function Home({ kakaoKey }) { 
+  const responseKaKao = (res) => {
+    console.log('kako login successed');
+    const kakaoId = res.profile.id;
+    const kakaoEmail = res.profile.kakao_account.email;
+    const kakaoToken = res.response.access_token;
+
+    axios.post('/api/auth/', { 
+        id: kakaoId,
+        email: kakaoEmail,
+        token: kakaoToken
+      }, 
+      { withCredentials: true }      
+    )
+    .then(res => {
+      console.log(res.data);
+      // console.log(document.cookie);
+      console.log(Cookies.get('user'));
+    });
+  }
+
+  const responseFail = () => {
+    console.log('kako login failed');
+  }
+
+  useEffect(() => {
+    if (window.Kakao.Auth === null) {
+      window.Kakao.init(kakaoKey);
+    }
+    console.log(Cookies.get('user'));
+  }, []);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -27,6 +77,15 @@ export default function Home() {
           <code className={styles.code}>MyDay</code>
           일기장
         </p>
+
+        <div>
+          <KaKaoLoginBtn
+              token={kakaoKey}
+              onSuccess={(res) => responseKaKao(res)}
+              onFail={() => responseFail()}
+              needProfile={true}
+          />
+        </div>
 
         <div className={styles.grid}>
           <Link href="/members/jae">
@@ -83,5 +142,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  )
+  );
 }

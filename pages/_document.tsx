@@ -11,16 +11,17 @@ export default class MyDocument extends Document {
     );
 
     const styleTags = sheet.getStyleElement();
-
+    
     return { ...page, styleTags };
   }
-
+  
   render() {
     return (
       <Html>
         <Head>
-          <title>My page</title>
+          <title>myday6</title>
           {this.props.styleTags}
+          <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
         </Head>
         <body>
           <Main />
